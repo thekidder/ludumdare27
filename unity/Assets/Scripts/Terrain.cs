@@ -3,6 +3,7 @@ using System.Collections;
 
 public class Terrain : MonoBehaviour {
 	public OTContainer terrainSheet;
+	public OTContainer house;
 	
 	private GameObject terrain;
 	
@@ -14,6 +15,14 @@ public class Terrain : MonoBehaviour {
 			GameObject chunk = createChunk(i, -2);
 			chunk.transform.parent = terrain.transform;
 		}
+		
+		OTSprite sprite = OT.CreateObject(OTObjectType.Sprite).GetComponent<OTSprite>();
+		sprite.size = new Vector2(128, 64);
+		sprite.pivot = OTObject.Pivot.Center;
+		sprite.position = new Vector2(-4 * 64, -1 * 64 - 32);
+		sprite.depth = -1;
+		sprite.spriteContainer = house;
+		sprite.transform.parent = terrain.transform;
 				
 		OTTween tweener = new OTTween(terrain.transform, 3.5f, OTEasing.SineInOut)
 			.Tween("position", new Vector3(0f, 8f, 0f));
