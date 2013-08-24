@@ -6,3 +6,10 @@
 *.csproj
 *.unityproj
 *.sln
+
+# windows thumbnails
+Thumbs.db
+
+# more unity things
+*.userprefs
+*.pidb
