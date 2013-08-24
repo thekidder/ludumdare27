@@ -121,7 +121,6 @@ public class CollisionDetector {
 			}
 			
 			Vector2 m = new Vector2(x, y);
-			Debug.Log ("move request change from " + moveVector + " to " + m);
 			return m;
 		}
 		
