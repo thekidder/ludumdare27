@@ -3,31 +3,29 @@ using System.Collections;
 
 public class Terrain : MonoBehaviour {
 	public OTContainer terrainSheet;
-	public OTContainer house;
-	
-	private GameObject terrain;
-	
+	public OTContainer houseSprite;
+		
 	// Use this for initialization
 	void Start () {
-		terrain = new GameObject();
+		GameObject world = this.transform.parent.gameObject;
 		
 		for(int i = -8; i <= 8; ++i) {
 			GameObject chunk = createChunk(i, -2);
-			chunk.transform.parent = terrain.transform;
+			chunk.transform.parent = world.transform;
 		}
 		
-		OTSprite sprite = OT.CreateObject(OTObjectType.Sprite).GetComponent<OTSprite>();
-		sprite.size = new Vector2(128, 64);
-		sprite.pivot = OTObject.Pivot.Center;
-		sprite.position = new Vector2(-4 * 64, -1 * 64 - 32);
-		sprite.depth = -1;
-		sprite.spriteContainer = house;
-		sprite.transform.parent = terrain.transform;
+		OTSprite house = OT.CreateObject(OTObjectType.Sprite).GetComponent<OTSprite>();
+		house.size = new Vector2(128, 64);
+		house.pivot = OTObject.Pivot.Center;
+		house.position = new Vector2(-4 * 64, -1 * 64 - 32);
+		house.depth = -1;
+		house.spriteContainer = houseSprite;
+		house.transform.parent = world.transform;
 				
-		OTTween tweener = new OTTween(terrain.transform, 3.5f, OTEasing.SineInOut)
+		// make the world bob
+		OTTween tweener = new OTTween(world.transform, 3.5f, OTEasing.SineInOut)
 			.Tween("position", new Vector3(0f, 8f, 0f));
 		
-		//tweener.playLoop = true;
 		tweener.pingPong = true;
 		tweener.playCount = -1;
 	}
