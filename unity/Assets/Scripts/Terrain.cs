@@ -1,30 +1,111 @@
 using UnityEngine;
+using System;
 using System.Collections;
+using SimpleJSON;
 
 public class Terrain : MonoBehaviour {
+	
+	private const uint FLIPPED_HORIZONTAL = 1u << 31;
+	private const uint FLIPPED_VERTICAL   = 1u << 30;
+	private const uint FLIPPED_DIAGONAL   = 1u << 29;
+
+	private const uint FLIP_MASK = (FLIPPED_HORIZONTAL | FLIPPED_VERTICAL | FLIPPED_DIAGONAL);
+	
+	private struct Tileset {
+		public Tileset(OTContainer s, int g, string n) {
+			spritesheet = s;
+			firstgid = g;
+			name = n;
+		}
+		
+		public OTContainer spritesheet;
+		public int firstgid;
+		public string name;
+	}
+	
+	public TextAsset levelFile;
 	public OTContainer terrainSheet;
-	public OTContainer houseSprite;
+	public OTContainer objectsSheet;
+	
+	private CollisionDetector collisionDetector;
 		
 	// Use this for initialization
 	void Start () {
 		GameObject world = this.transform.parent.gameObject;
 		
-		for(int i = -8; i <= 8; ++i) {
-			GameObject chunk = createChunk(i, -2);
-			chunk.transform.parent = world.transform;
+		var level = JSON.Parse(levelFile.text);
+		
+		int levelHeight = level["height"].AsInt;
+		int levelWidth  = level["width"].AsInt;
+		
+		collisionDetector = new CollisionDetector(levelWidth, levelHeight);
+		
+		Tileset[] tilesets = new Tileset[level["tilesets"].AsArray.Count];
+		for(int i = 0; i < level["tilesets"].AsArray.Count; ++i) {
+			JSONNode tileset = level["tilesets"].AsArray[i];
+			string name = tileset["name"];
+			
+			if(name == "terrain") {
+				tilesets[i] = new Tileset(terrainSheet, tileset["firstgid"].AsInt, "terrain");
+			} else if(name == "objects") {
+				tilesets[i] = new Tileset(objectsSheet, tileset["firstgid"].AsInt, "objects");
+			} else if(name == "collision") {
+				tilesets[i] = new Tileset(null, tileset["firstgid"].AsInt, "collision");
+			} else {
+				Debug.Log ("tileset name: '" + tileset["name"] + "'");
+				tilesets[i] = new Tileset(null, tileset["firstgid"].AsInt, "NO SHEET");
+			}
 		}
 		
-		OTSprite house = OT.CreateObject(OTObjectType.Sprite).GetComponent<OTSprite>();
-		house.size = new Vector2(128, 64);
-		house.pivot = OTObject.Pivot.Center;
-		house.position = new Vector2(-4 * 64, -1 * 64 - 32);
-		house.depth = -1;
-		house.spriteContainer = houseSprite;
-		house.transform.parent = world.transform;
+		Array.Reverse(tilesets);
+		
+		int depth = -1;
+		foreach(JSONNode layer in level["layers"].AsArray) {
+			for(int i = 0; i < layer["data"].AsArray.Count; ++i) {
+				long tileIndex = layer["data"].AsArray[i].AsInt;
+				
+				if (tileIndex == 0) {
+					continue;
+				}
+				
+				int x = i % levelWidth;
+				int y = i / levelWidth;
+				y = levelHeight - y - 1;
+				
+				tileIndex = tileIndex & ~FLIP_MASK;
+				
+				OTContainer spriteContainer = null;
+				foreach(Tileset t in tilesets) {
+					if(tileIndex >= t.firstgid) {
+						tileIndex -= t.firstgid;
+						
+						if(t.name == "collision") {
+							collisionDetector.SetCollidable(x, y);
+						}
+						
+						spriteContainer = t.spritesheet;
+						break;
+					}
+				}
+				
+				if(!layer["visible"].AsBool) {
+					continue;
+				}
+
+				OTSprite tile = createSprite(x, y, world); // random offsets that puts terrain where I want it
+				tile.spriteContainer = spriteContainer;
+				tile.depth = depth;	
+				tile.frameIndex = (int)tileIndex;
+				
+			}
+			
+			depth -= 1;
+		}
 				
 		// make the world bob
+		Vector3 bobPos = world.transform.position + new Vector3(0f, 8f, 0f);
 		OTTween tweener = new OTTween(world.transform, 3.5f, OTEasing.SineInOut)
-			.Tween("position", new Vector3(0f, 8f, 0f));
+			.Tween("position", bobPos);
 		
 		tweener.pingPong = true;
 		tweener.playCount = -1;
@@ -35,34 +116,22 @@ public class Terrain : MonoBehaviour {
 	
 	}
 	
-	private GameObject createChunk(int x, int y) {
-		OTSprite top = createSprite(0, 0);
-		top.frameIndex = Random.Range (0, 4);
-		
-		OTSprite middle = createSprite(0, -1);
-		middle.frameIndex = Random.Range (4, 8);
-		
-		OTSprite bottom = createSprite(0, -2);
-		bottom.frameIndex = Random.Range (8, 12);
-		
-		GameObject container = new GameObject();
-		
-		top.transform.parent = container.transform;
-		middle.transform.parent = container.transform;
-		bottom.transform.parent = container.transform;
-		
-		container.transform.Translate(new Vector3(x * 64, y * 64, 0));
-		
-		return container;
+	public Vector2 Move(Vector3 position, Rect collisionBox, Vector2 moveRequest) {
+		Rect collider = new Rect(collisionBox.x + position.x, collisionBox.y + position.y, collisionBox.width, collisionBox.height);
+		return collisionDetector.Move(collider, moveRequest);
 	}
 	
-	private OTSprite createSprite(int x, int y) {
+	public bool CanMoveTo(float x, float y, Rect collisionBox) {
+		Rect collider = new Rect(collisionBox.x + x, collisionBox.y + y, collisionBox.width, collisionBox.height);
+		return !collisionDetector.Collides(collider);
+	}
+	
+	private OTSprite createSprite(int x, int y, GameObject world) {
 		OTSprite sprite = OT.CreateObject(OTObjectType.Sprite).GetComponent<OTSprite>();
-		sprite.size = new Vector2(64, 64);
-		sprite.pivot = OTObject.Pivot.Center;
-		sprite.position = new Vector2(x * 64, y * 64);
-		sprite.depth = -1;
-		sprite.spriteContainer = terrainSheet;
+		sprite.size = new Vector2(32, 32);
+		sprite.pivot = OTObject.Pivot.BottomLeft;
+		sprite.transform.parent = world.transform;
+		sprite.position = new Vector2(x * 32, y * 32);
 		
 		return sprite;
 	}
