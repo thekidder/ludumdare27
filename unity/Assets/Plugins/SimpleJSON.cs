@@ -1,6 +1,4 @@
-﻿#define USE_SharpZipLib
-
-/* * * * *
+﻿/* * * * *
  * A simple JSON Parser / builder
  * ------------------------------
  * 
@@ -433,6 +431,8 @@ namespace SimpleJSON
         }
         #endif
 		
+#if ENABLE_FILEIO
+		
 		public void SaveToFile(string aFileName)
 		{
 			System.IO.Directory.CreateDirectory((new System.IO.FileInfo(aFileName)).Directory.FullName);
@@ -450,6 +450,9 @@ namespace SimpleJSON
 				return System.Convert.ToBase64String(stream.ToArray());
 			}
 		}
+		
+#endif
+		
 		public static JSONNode Deserialize(System.IO.BinaryReader aReader)
 		{
 			JSONBinaryTag type = (JSONBinaryTag)aReader.ReadByte();
