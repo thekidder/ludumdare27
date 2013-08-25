@@ -13,7 +13,7 @@ public class Starfield : MonoBehaviour {
 			Vector3 scale = this.transform.localScale;
 			Vector3 pos = this.transform.position;
 			star.position = new Vector2(Random.Range(pos.x - scale.x, pos.x + scale.x), Random.Range(pos.y - scale.y, pos.y + scale.y));
-			star.depth = -100;
+			star.depth = -1;
 		}
 	}
 	

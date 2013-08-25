@@ -78,10 +78,8 @@ public class CollisionDetector {
 				float y = (bottomRight.y + 1) * TILE_SIZE - (collider.yMin + moveVector.y);
 				
 				if(x < y) {
-					Debug.Log ("push x");
 					return new Vector2(bottomRight.x * TILE_SIZE - collider.xMax - 1f, moveVector.y);
 				} else {
-					Debug.Log ("push y");
 					return new Vector2(moveVector.x, ((bottomRight.y + 1) * TILE_SIZE) - collider.yMin);
 				}
 			}

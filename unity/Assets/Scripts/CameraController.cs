@@ -5,12 +5,12 @@ public class CameraController : MonoBehaviour {
 	
 	public float cameraXPadding;
 	public float cameraYPadding;
-
 	
 	public GameObject toFollow;
 	
 	// Use this for initialization
 	void Start () {
+
 	}
 	
 	// Update is called once per frame
@@ -34,4 +34,5 @@ public class CameraController : MonoBehaviour {
 		
 		OT.view.position = new Vector2(x, y);
 	}
+
 }

@@ -97,7 +97,7 @@ public class Terrain : MonoBehaviour {
 				
 				if(tileIndex == 4 && spriteContainer == objectsSheet) {
 					// firefly, add to fireflies manager instead
-					fireflies.Add(x * 32, y * 32);
+					fireflies.SpawnAt(x * 32, y * 32);
 					continue;
 				}
 				
@@ -114,7 +114,7 @@ public class Terrain : MonoBehaviour {
                         rotation = 90f;
                         flip_y = false;
 					} else if((flipped & FLIPPED_HORIZONTAL) == 0 && (flipped & FLIPPED_VERTICAL) == 0) {
-                        rotation = -90f;
+                        rotation = 90f;
                         flip_x = true;
 					} else {
                         rotation = 90f;

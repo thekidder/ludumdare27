@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 
 public class IntroCutscene : MonoBehaviour {
+	public bool showCutscene = true;
 	
 	public Boy boy;
 	
@@ -71,17 +72,19 @@ public class IntroCutscene : MonoBehaviour {
 		allDialog.Add(new Dialog(dadPos, "Yeah.", dadColor, dadStyle, 7.5f, 10.5f));
 		allDialog.Add(new Dialog(kidPos, "There are so many of them!", kidColor, kidStyle, 11.0f, 14.0f));
 		allDialog.Add(new Dialog(dadPos, "But the universe is so big. A star dies every ten seconds.", dadColor, dadStyle, 14.5f, 19.5f));
+		
+		Camera.mainCamera.GetComponent<FadeController>().FadeIn(2.5f, 2f);
 	}
 	
 	// Update is called once per frame
 	void Update () {
 		OT.view.position = new Vector2(0f, cameraPos);
 		
-		if(Time.time > 24f) {
+		if(Time.time > 22f || !showCutscene) {
 			boy.gameObject.SetActive(true);
 		}
 		
-		if(Time.time > 27f) {
+		if(Time.time > 27f || !showCutscene) {
 			GetComponent<CameraController>().enabled = true;
 			this.enabled = false;
 		}
@@ -92,6 +95,7 @@ public class IntroCutscene : MonoBehaviour {
 		if(Time.time < 3.5) {
 			GUI.skin = titleSkin;			
 			GUI.color = new Color(1f, 1f, 1f, 3.5f - Time.time);
+			GUI.depth = -1005;
 			
 			GUI.Label(new Rect(0, 0, Screen.width, Screen.height), "Firefly");
 			

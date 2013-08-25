@@ -2,9 +2,11 @@ using UnityEngine;
 using System.Collections;
 
 public class Firefly : MonoBehaviour {
-	public OTAnimation visibleAnimation;
-	public float visibleTime;
-	public float speed;
+	public float visibleTime = 1.4f;
+	public float speed = 120f;
+	public float lifetime = 45f;
+	
+	public bool immediate = false;
 	
 	private enum FlyDirection {
 		LEFT,
@@ -19,25 +21,30 @@ public class Firefly : MonoBehaviour {
 	private float perlinXOffset;
 	private float perlinYOffset;
 	
+	private float timeLeft;
+	
 	// Use this for initialization
 	void Start () {
 		visibilityChangeTime = Time.time - Random.Range(0.0f, 10.0f);
+		if(immediate) {
+			visibilityChangeTime = 0f;
+		}
 		
 		perlinXOffset = Random.Range(-500.0f, 500.0f);
 		perlinYOffset = Random.Range(-500.0f, 500.0f);
 		
 		GetComponent<OTAnimatingSprite>().PlayLoop("right");
+		
+		timeLeft = lifetime;
 	}
 	
 	// Update is called once per frame
 	void Update () {
 		if(visible && Time.time - visibilityChangeTime > visibleTime) {
-			GetComponent<OTAnimatingSprite>().alpha = 0.005f;
+			GetComponent<OTAnimatingSprite>().alpha = 0.008f;
 			visible = false;
 		} else if(!visible && Time.time - visibilityChangeTime > 10.0f) {
-			GetComponent<OTAnimatingSprite>().alpha = 1.0f;
-			visibilityChangeTime = Time.time;
-			visible = true;
+			SetVisible ();
 		}
 		
 		float xDirection = Mathf.PerlinNoise(perlinXOffset + Time.time / 1.5f, 0.0f) - 0.48f;
@@ -52,5 +59,17 @@ public class Firefly : MonoBehaviour {
 			currentDirection = FlyDirection.LEFT;
 			GetComponent<OTAnimatingSprite>().PlayLoop("left");
 		}
+		
+		timeLeft -= Time.deltaTime;
+	}
+	
+	public void SetVisible() {
+		GetComponent<OTAnimatingSprite>().alpha = 1.0f;
+		visibilityChangeTime = Time.time;
+		visible = true;
+	}
+	
+	public bool Dead() {
+		return timeLeft <= 0f;
 	}
 }
