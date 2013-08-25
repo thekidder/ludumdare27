@@ -22,11 +22,13 @@ public class Terrain : MonoBehaviour {
 		public int firstgid;
 		public string name;
 	}
+
+	public Fireflies fireflies;
 	
 	public TextAsset levelFile;
 	public OTContainer terrainSheet;
 	public OTContainer objectsSheet;
-	
+
 	private CollisionDetector collisionDetector;
 		
 	// Use this for initialization
@@ -89,6 +91,12 @@ public class Terrain : MonoBehaviour {
 				}
 				
 				if(!layer["visible"].AsBool) {
+					continue;
+				}
+				
+				if(tileIndex == 4 && spriteContainer == objectsSheet) {
+					// firefly, add to fireflies manager instead
+					fireflies.Add(x * 32, y * 32);
 					continue;
 				}
 

@@ -40,9 +40,9 @@ public class Firefly : MonoBehaviour {
 			visible = true;
 		}
 		
-		float xDirection = Mathf.PerlinNoise(perlinXOffset + Time.time, 0.0f) - 0.5f;
-		float yDirection = Mathf.PerlinNoise(0.0f, perlinYOffset + Time.time) - 0.5f;
-		
+		float xDirection = Mathf.PerlinNoise(perlinXOffset + Time.time / 1.5f, 0.0f) - 0.48f;
+		float yDirection = Mathf.PerlinNoise(0.0f, perlinYOffset + Time.time / 1.5f) - 0.47f;
+				
 		transform.Translate(speed * xDirection * Time.deltaTime, speed * yDirection * Time.deltaTime, 0.0f);
 		
 		if(xDirection > 0 && currentDirection != FlyDirection.RIGHT) {
