@@ -118,7 +118,7 @@ public class Terrain : MonoBehaviour {
 	
 	public Vector2 Move(Vector3 position, Rect collisionBox, Vector2 moveRequest) {
 		Rect collider = new Rect(collisionBox.x + position.x, collisionBox.y + position.y, collisionBox.width, collisionBox.height);
-		return collisionDetector.Move(collider, moveRequest);
+		return collisionDetector.Move(collider, moveRequest);// * 0.99f;
 	}
 	
 	public bool CanMoveTo(float x, float y, Rect collisionBox) {
