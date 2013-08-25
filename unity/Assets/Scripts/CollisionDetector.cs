@@ -32,8 +32,15 @@ public class CollisionDetector {
 		int intX = (int)(x + 0.5);
 		int intY = (int)(y + 0.5);
 		
-		if(tiles[intX / TILE_SIZE + (intY / TILE_SIZE) * width]) {
-			return new Point(intX / TILE_SIZE, intY / TILE_SIZE);
+		intX /= TILE_SIZE;
+		intY /= TILE_SIZE;
+		
+		if(intX <0 || intX >= width || intY < 0 || intY >= height) {
+			return null;
+		}
+		
+		if(tiles[intX + intY * width]) {
+			return new Point(intX, intY);
 		}
 		return null;
 	}
