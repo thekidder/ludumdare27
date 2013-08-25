@@ -78,8 +78,7 @@ public class IntroCutscene : MonoBehaviour {
 		OT.view.position = new Vector2(0f, cameraPos);
 		
 		if(Time.time > 24f) {
-			Debug.Log ("boy enabled");
-			boy.gameObject.active = true;
+			boy.gameObject.SetActive(true);
 		}
 		
 		if(Time.time > 27f) {
