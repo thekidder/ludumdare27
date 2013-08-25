@@ -111,7 +111,7 @@ public class Terrain : MonoBehaviour {
                         rotation = 90f;
                         flip_x = false;
 					} else if((flipped & FLIPPED_HORIZONTAL) == 0 && (flipped & FLIPPED_VERTICAL) > 0) {
-                        rotation = -90f;
+                        rotation = 90f;
                         flip_y = false;
 					} else if((flipped & FLIPPED_HORIZONTAL) == 0 && (flipped & FLIPPED_VERTICAL) == 0) {
                         rotation = -90f;
@@ -161,9 +161,9 @@ public class Terrain : MonoBehaviour {
 	private OTSprite createSprite(int x, int y, GameObject world) {
 		OTSprite sprite = OT.CreateObject(OTObjectType.Sprite).GetComponent<OTSprite>();
 		sprite.size = new Vector2(32, 32);
-		sprite.pivot = OTObject.Pivot.BottomLeft;
+		sprite.pivot = OTObject.Pivot.Center;
 		sprite.transform.parent = world.transform;
-		sprite.position = new Vector2(x * 32, y * 32);
+		sprite.position = new Vector2(x * 32 + 16, y * 32 + 16);
 		
 		return sprite;
 	}
