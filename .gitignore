@@ -7,8 +7,9 @@
 *.unityproj
 *.sln
 
-# windows thumbnails
+# windows/mac tmp files
 Thumbs.db
+.DS_Store
 
 # more unity things
 *.userprefs
