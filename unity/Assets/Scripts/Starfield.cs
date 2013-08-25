@@ -5,8 +5,7 @@ public class Starfield : MonoBehaviour {
 	public int numStars;
 	
 	private static string[] sprites = {"BlueStar", "RedStar", "YellowStar", "WhiteStar"};
-	
-	
+
 	// Use this for initialization
 	void Start () {
 		for(int i = 0; i < numStars; ++i) {
