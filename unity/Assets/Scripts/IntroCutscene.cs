@@ -67,9 +67,9 @@ public class IntroCutscene : MonoBehaviour {
 		dadStyle.normal.textColor = dadColor;
 		
 
-		allDialog.Add(new Dialog(kidPos, "Look at all the stars, dad", kidColor, kidStyle, 4.0f, 7.0f));
+		allDialog.Add(new Dialog(kidPos, "Look at all the stars, dad.", kidColor, kidStyle, 4.0f, 7.0f));
 		allDialog.Add(new Dialog(dadPos, "Yeah.", dadColor, dadStyle, 7.5f, 10.5f));
-		allDialog.Add(new Dialog(kidPos, "There are so many of them", kidColor, kidStyle, 11.0f, 14.0f));
+		allDialog.Add(new Dialog(kidPos, "There are so many of them!", kidColor, kidStyle, 11.0f, 14.0f));
 		allDialog.Add(new Dialog(dadPos, "But the universe is so big. A star dies every ten seconds.", dadColor, dadStyle, 14.5f, 19.5f));
 	}
 	

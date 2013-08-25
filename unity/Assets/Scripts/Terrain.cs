@@ -12,14 +12,14 @@ public class Terrain : MonoBehaviour {
 	private const uint FLIP_MASK = (FLIPPED_HORIZONTAL | FLIPPED_VERTICAL | FLIPPED_DIAGONAL);
 	
 	private struct Tileset {
-		public Tileset(OTContainer s, int g, string n) {
+		public Tileset(OTContainer s, uint g, string n) {
 			spritesheet = s;
 			firstgid = g;
 			name = n;
 		}
 		
 		public OTContainer spritesheet;
-		public int firstgid;
+		public uint firstgid;
 		public string name;
 	}
 
@@ -48,14 +48,14 @@ public class Terrain : MonoBehaviour {
 			string name = tileset["name"];
 			
 			if(name == "terrain") {
-				tilesets[i] = new Tileset(terrainSheet, tileset["firstgid"].AsInt, "terrain");
+				tilesets[i] = new Tileset(terrainSheet, tileset["firstgid"].AsUInt, "terrain");
 			} else if(name == "objects") {
-				tilesets[i] = new Tileset(objectsSheet, tileset["firstgid"].AsInt, "objects");
+				tilesets[i] = new Tileset(objectsSheet, tileset["firstgid"].AsUInt, "objects");
 			} else if(name == "collision") {
-				tilesets[i] = new Tileset(null, tileset["firstgid"].AsInt, "collision");
+				tilesets[i] = new Tileset(null, tileset["firstgid"].AsUInt, "collision");
 			} else {
 				Debug.Log ("tileset name: '" + tileset["name"] + "'");
-				tilesets[i] = new Tileset(null, tileset["firstgid"].AsInt, "NO SHEET");
+				tilesets[i] = new Tileset(null, tileset["firstgid"].AsUInt, "NO SHEET");
 			}
 		}
 		
@@ -64,7 +64,7 @@ public class Terrain : MonoBehaviour {
 		int depth = -1;
 		foreach(JSONNode layer in level["layers"].AsArray) {
 			for(int i = 0; i < layer["data"].AsArray.Count; ++i) {
-				long tileIndex = layer["data"].AsArray[i].AsInt;
+				uint tileIndex = layer["data"].AsArray[i].AsUInt;
 				
 				if (tileIndex == 0) {
 					continue;
@@ -74,6 +74,7 @@ public class Terrain : MonoBehaviour {
 				int y = i / levelWidth;
 				y = levelHeight - y - 1;
 				
+				uint flipped = tileIndex & FLIP_MASK;
 				tileIndex = tileIndex & ~FLIP_MASK;
 				
 				OTContainer spriteContainer = null;
@@ -99,12 +100,35 @@ public class Terrain : MonoBehaviour {
 					fireflies.Add(x * 32, y * 32);
 					continue;
 				}
+				
+				bool flip_x = (flipped & FLIPPED_HORIZONTAL) > 0;
+                bool flip_y = (flipped & FLIPPED_VERTICAL) > 0;
+				
+				float rotation = 0f;
+				
+                if((flipped & FLIPPED_DIAGONAL) > 0) {
+                    if((flipped & FLIPPED_HORIZONTAL) > 0 && (flipped & FLIPPED_VERTICAL) == 0) {
+                        rotation = 90f;
+                        flip_x = false;
+					} else if((flipped & FLIPPED_HORIZONTAL) == 0 && (flipped & FLIPPED_VERTICAL) > 0) {
+                        rotation = -90f;
+                        flip_y = false;
+					} else if((flipped & FLIPPED_HORIZONTAL) == 0 && (flipped & FLIPPED_VERTICAL) == 0) {
+                        rotation = -90f;
+                        flip_x = true;
+					} else {
+                        rotation = 90f;
+                        flip_y = false;
+					}
+				}
 
 				OTSprite tile = createSprite(x, y, world); // random offsets that puts terrain where I want it
 				tile.spriteContainer = spriteContainer;
-				tile.depth = depth;	
+				tile.depth = depth;
+				tile.rotation = rotation;
+				tile.flipHorizontal = flip_x;
+				tile.flipVertical = flip_y;
 				tile.frameIndex = (int)tileIndex;
-				
 			}
 			
 			depth -= 1;

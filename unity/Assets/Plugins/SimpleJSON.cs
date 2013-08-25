@@ -111,6 +111,20 @@ namespace SimpleJSON
                 Value = value.ToString();
             }
         }
+		public virtual uint AsUInt
+        {
+            get
+            {
+                uint v = 0;
+                if (uint.TryParse(Value,out v))
+                    return v;
+                return 0u;
+            }
+            set
+            {
+                Value = value.ToString();
+            }
+        }
         public virtual float AsFloat
         {
             get
