@@ -65,8 +65,8 @@ public class CollisionDetector {
 			if(bottomLeft != null) {
 				float x = (bottomLeft.x + 1) * TILE_SIZE - (collider.xMin + moveVector.x);
 				float y = (bottomLeft.y + 1) * TILE_SIZE - (collider.yMin + moveVector.y);
-				
-				if(x > y) {
+								
+				if(x < y) {
 					return new Vector2( ((bottomLeft.x + 1) * TILE_SIZE) - collider.xMin, moveVector.y);
 				} else {
 					return new Vector2(moveVector.x, ((bottomLeft.y + 1) * TILE_SIZE) - collider.yMin);
@@ -77,7 +77,7 @@ public class CollisionDetector {
 				float x = (collider.xMax + moveVector.x) - bottomRight.x * TILE_SIZE;
 				float y = (bottomRight.y + 1) * TILE_SIZE - (collider.yMin + moveVector.y);
 				
-				if(x > y) {
+				if(x < y) {
 					return new Vector2(bottomRight.x * TILE_SIZE - collider.xMax, moveVector.y);
 				} else {
 					return new Vector2(moveVector.x, ((bottomRight.y + 1) * TILE_SIZE) - collider.yMin);
@@ -88,7 +88,7 @@ public class CollisionDetector {
 				float x = (topLeft.x + 1) * TILE_SIZE - (collider.xMin + moveVector.x);
 				float y = (collider.yMax + moveVector.y) - topLeft.y * TILE_SIZE;
 				
-				if(x > y) {
+				if(x < y) {
 					return new Vector2( ((topLeft.x + 1) * TILE_SIZE) - collider.xMin, moveVector.y);
 				} else {
 					return new Vector2(moveVector.x, topLeft.y * TILE_SIZE - collider.yMax);
@@ -99,7 +99,7 @@ public class CollisionDetector {
 				float x = (collider.xMax + moveVector.x) - topRight.x * TILE_SIZE;
 				float y = (collider.yMax + moveVector.y) - topRight.y * TILE_SIZE;
 				
-				if(x > y) {
+				if(x < y) {
 					return new Vector2(topRight.x * TILE_SIZE - collider.xMax, moveVector.y);
 				} else {
 					return new Vector2(moveVector.x, topRight.y * TILE_SIZE - collider.yMax);
