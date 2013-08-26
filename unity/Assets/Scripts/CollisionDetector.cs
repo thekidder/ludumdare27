@@ -74,7 +74,7 @@ public class CollisionDetector {
 				float y = (bottomLeft.y + 1) * TILE_SIZE - (collider.yMin + moveVector.y);
 								
 				if(x < y) {
-					return new Vector2( ((bottomLeft.x + 1) * TILE_SIZE) - collider.xMin, moveVector.y);
+					return new Vector2( ((bottomLeft.x + 1) * TILE_SIZE) - collider.xMin + 1f, moveVector.y);
 				} else {
 					return new Vector2(moveVector.x, ((bottomLeft.y + 1) * TILE_SIZE) - collider.yMin);
 				}
@@ -96,9 +96,9 @@ public class CollisionDetector {
 				float y = (collider.yMax + moveVector.y) - topLeft.y * TILE_SIZE;
 				
 				if(x < y) {
-					return new Vector2( ((topLeft.x + 1) * TILE_SIZE) - collider.xMin, moveVector.y);
+					return new Vector2( ((topLeft.x + 1) * TILE_SIZE) - collider.xMin + 1f, moveVector.y);
 				} else {
-					return new Vector2(moveVector.x, topLeft.y * TILE_SIZE - collider.yMax);
+					return new Vector2(moveVector.x, topLeft.y * TILE_SIZE - collider.yMax + 1f);
 				}
 			}
 			
@@ -107,9 +107,9 @@ public class CollisionDetector {
 				float y = (collider.yMax + moveVector.y) - topRight.y * TILE_SIZE;
 				
 				if(x < y) {
-					return new Vector2(topRight.x * TILE_SIZE - collider.xMax, moveVector.y);
+					return new Vector2(topRight.x * TILE_SIZE - collider.xMax - 1f, moveVector.y);
 				} else {
-					return new Vector2(moveVector.x, topRight.y * TILE_SIZE - collider.yMax);
+					return new Vector2(moveVector.x, topRight.y * TILE_SIZE - collider.yMax + 1f);
 				}
 			}
 		} else {// side collision
@@ -122,7 +122,7 @@ public class CollisionDetector {
 			}
 			
 			if(top) {
-				y = topRight.y * TILE_SIZE - collider.yMax;
+				y = topRight.y * TILE_SIZE - collider.yMax + 1f;
 			} else if(bottom) {
 				y = ((bottomRight.y + 1) * TILE_SIZE) - collider.yMin;
 			}

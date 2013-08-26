@@ -16,10 +16,18 @@ public class Fireflies : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-		if(spawning && fireflies.Count < 6 && Random.Range(0.0f, 1.0f) < 0.009f && spawnPoints.Count > 0) {
+		if(spawning && fireflies.Count < 16 && Random.Range(0.0f, 1.0f) < 0.009f && spawnPoints.Count > 0) {
 			Vector2 pos = spawnPoints[Random.Range (0, spawnPoints.Count)];
 			
 			Add (pos.x, pos.y);
+		}
+		
+		foreach(OTAnimatingSprite firefly in fireflies) {
+			if(firefly.GetComponent<Firefly>().Dead()) {
+				fireflies.Remove(firefly);
+				OT.Destroy(firefly);
+				break;
+			}
 		}
 	}
 	
@@ -44,7 +52,7 @@ public class Fireflies : MonoBehaviour {
 	
 	public bool Captures(Rect net) {
 		foreach(OTAnimatingSprite firefly in fireflies) {
-			if((net.Contains(firefly.transform.position) && firefly.GetComponent<Firefly>().Visible()) || firefly.GetComponent<Firefly>().Dead()) {
+			if((net.Contains(firefly.transform.position) && firefly.GetComponent<Firefly>().Visible())) {
 				fireflies.Remove(firefly);
 				OT.Destroy(firefly);
 				return true;

@@ -109,16 +109,17 @@ public class Terrain : MonoBehaviour {
                 if((flipped & FLIPPED_DIAGONAL) > 0) {
                     if((flipped & FLIPPED_HORIZONTAL) > 0 && (flipped & FLIPPED_VERTICAL) == 0) {
                         rotation = 90f;
-                        flip_x = false;
+                        flip_x = true;
 					} else if((flipped & FLIPPED_HORIZONTAL) == 0 && (flipped & FLIPPED_VERTICAL) > 0) {
-                        rotation = 90f;
-                        flip_y = false;
+                        rotation = -90f;
+                        flip_y = true;
 					} else if((flipped & FLIPPED_HORIZONTAL) == 0 && (flipped & FLIPPED_VERTICAL) == 0) {
-                        rotation = 90f;
+                        rotation = -90f;
                         flip_x = true;
 					} else {
                         rotation = 90f;
-                        flip_y = false;
+                        //flip_y = false;
+						flip_x = true;
 					}
 				}
 
