@@ -8,6 +8,13 @@ public class CollisionDetector {
 	private int width;
 	private int height;
 	
+	private enum Corner {
+		TOP_LEFT,
+		TOP_RIGHT,
+		BOTTOM_LEFT,
+		BOTTOM_RIGHT
+	}
+	
 	private class Point {
 		public Point(int i, int j) {
 			x = i;
@@ -28,14 +35,30 @@ public class CollisionDetector {
 		tiles[x + y * width] = true;
 	}
 
-	private Point Collides(float x, float y) {
-		int intX = (int)(x + 0.5);
-		int intY = (int)(y + 0.5);
+	private Point Collides(float x, float y, Corner corner) {
+		if(x % TILE_SIZE == 0 && y % TILE_SIZE == 0) {
+			return null; // boundaries do not collide
+		}
+		
+		int intX = (int)(x);// + 0.5);
+		int intY = (int)(y);// + 0.5);
+		
+		if(x % TILE_SIZE == 0f) {
+			if(corner == Corner.TOP_RIGHT || corner == Corner.BOTTOM_RIGHT) {
+				intX -= 1;
+			}
+		}
+		
+		if(y % TILE_SIZE == 0f) {
+			if(corner == Corner.TOP_RIGHT || corner == Corner.TOP_LEFT) {
+				intX -= 1;
+			}
+		}
 		
 		intX /= TILE_SIZE;
 		intY /= TILE_SIZE;
 		
-		if(intX <0 || intX >= width || intY < 0 || intY >= height) {
+		if(intX < 0 || intX >= width || intY < 0 || intY >= height) {
 			return null;
 		}
 		
@@ -46,17 +69,17 @@ public class CollisionDetector {
 	}
 	
 	public bool Collides(Rect collider) {
-		return Collides (collider.xMin, collider.yMin) != null
-			|| Collides (collider.xMin, collider.yMax) != null
-			|| Collides (collider.xMax, collider.yMax) != null
-			|| Collides (collider.xMax, collider.yMin) != null;
+		return Collides (collider.xMin, collider.yMin, Corner.BOTTOM_LEFT) != null
+			|| Collides (collider.xMin, collider.yMax, Corner.TOP_LEFT) != null
+			|| Collides (collider.xMax, collider.yMax, Corner.TOP_LEFT) != null
+			|| Collides (collider.xMax, collider.yMin, Corner.BOTTOM_RIGHT) != null;
 	}
 	
 	public Vector2 Move(Rect collider, Vector2 moveVector) {
-		Point bottomLeft  = Collides (collider.xMin + moveVector.x, collider.yMin + moveVector.y);
-		Point topLeft     = Collides (collider.xMin + moveVector.x, collider.yMax + moveVector.y);
-		Point topRight    = Collides (collider.xMax + moveVector.x, collider.yMax + moveVector.y);
-		Point bottomRight = Collides (collider.xMax + moveVector.x, collider.yMin + moveVector.y);
+		Point bottomLeft  = Collides (collider.xMin + moveVector.x, collider.yMin + moveVector.y, Corner.BOTTOM_LEFT);
+		Point topLeft     = Collides (collider.xMin + moveVector.x, collider.yMax + moveVector.y, Corner.TOP_LEFT);
+		Point topRight    = Collides (collider.xMax + moveVector.x, collider.yMax + moveVector.y, Corner.TOP_RIGHT);
+		Point bottomRight = Collides (collider.xMax + moveVector.x, collider.yMin + moveVector.y, Corner.BOTTOM_RIGHT);
 		
 		if(bottomLeft == null && bottomRight == null && topLeft == null && topRight == null) {
 			return moveVector;
@@ -69,60 +92,53 @@ public class CollisionDetector {
 		
 		if(!left && !right && !top && !bottom) {
 			// single collision
+			float minSq = float.MaxValue;
+			Vector2 r = Vector2.zero;
+			
 			if(bottomLeft != null) {
-				float x = (bottomLeft.x + 1) * TILE_SIZE - (collider.xMin + moveVector.x);
-				float y = (bottomLeft.y + 1) * TILE_SIZE - (collider.yMin + moveVector.y);
-								
-				if(x < y) {
-					return new Vector2( ((bottomLeft.x + 1) * TILE_SIZE) - collider.xMin + 1f, moveVector.y);
-				} else {
-					return new Vector2(moveVector.x, ((bottomLeft.y + 1) * TILE_SIZE) - collider.yMin);
+				Vector2 v = theCollision(collider, bottomLeft, moveVector);
+				if(v.sqrMagnitude < minSq) {
+					minSq = v.sqrMagnitude;
+					r = v;
 				}
 			}
 			
 			if(bottomRight != null) {
-				float x = (collider.xMax + moveVector.x) - bottomRight.x * TILE_SIZE;
-				float y = (bottomRight.y + 1) * TILE_SIZE - (collider.yMin + moveVector.y);
-				
-				if(x < y) {
-					return new Vector2(bottomRight.x * TILE_SIZE - collider.xMax - 1f, moveVector.y);
-				} else {
-					return new Vector2(moveVector.x, ((bottomRight.y + 1) * TILE_SIZE) - collider.yMin);
+				Vector2 v = theCollision(collider, bottomRight, moveVector);
+				if(v.sqrMagnitude < minSq) {
+					minSq = v.sqrMagnitude;
+					r = v;
 				}
 			}
 
 			if(topLeft != null) {
-				float x = (topLeft.x + 1) * TILE_SIZE - (collider.xMin + moveVector.x);
-				float y = (collider.yMax + moveVector.y) - topLeft.y * TILE_SIZE;
-				
-				if(x < y) {
-					return new Vector2( ((topLeft.x + 1) * TILE_SIZE) - collider.xMin + 1f, moveVector.y);
-				} else {
-					return new Vector2(moveVector.x, topLeft.y * TILE_SIZE - collider.yMax + 1f);
+				Vector2 v = theCollision(collider, topLeft, moveVector);
+				if(v.sqrMagnitude < minSq) {
+					minSq = v.sqrMagnitude;
+					r = v;
 				}
 			}
 			
 			if(topRight != null) {
-				float x = (collider.xMax + moveVector.x) - topRight.x * TILE_SIZE;
-				float y = (collider.yMax + moveVector.y) - topRight.y * TILE_SIZE;
-				
-				if(x < y) {
-					return new Vector2(topRight.x * TILE_SIZE - collider.xMax - 1f, moveVector.y);
-				} else {
-					return new Vector2(moveVector.x, topRight.y * TILE_SIZE - collider.yMax + 1f);
+				Vector2 v = theCollision(collider, topRight, moveVector);
+				if(v.sqrMagnitude < minSq) {
+					minSq = v.sqrMagnitude;
+					r = v;
 				}
 			}
+			
+			return r;
 		} else {// side collision
 			float x = 0;
 			float y = 0;
 			if(left) {
-				x = ((topLeft.x + 1) * TILE_SIZE) - collider.xMin + 1f;
+				x = ((topLeft.x + 1) * TILE_SIZE) - collider.xMin;
 			} else if(right) {
-				x = topRight.x * TILE_SIZE - collider.xMax - 1f;
+				x = topRight.x * TILE_SIZE - collider.xMax;
 			}
 			
 			if(top) {
-				y = topRight.y * TILE_SIZE - collider.yMax + 1f;
+				y = topRight.y * TILE_SIZE - collider.yMax;
 			} else if(bottom) {
 				y = ((bottomRight.y + 1) * TILE_SIZE) - collider.yMin;
 			}
@@ -132,5 +148,40 @@ public class CollisionDetector {
 		}
 		
 		return new Vector2(); // never happens
+	}
+	
+	private Vector2 Project(Rect r, Vector2 axis) {
+		Vector2 n = axis.normalized;
+		
+		float xMin = r.xMin * n.x;
+		float xMax = r.xMax * n.x;
+		
+		float yMin = r.yMin * n.y;
+		float yMax = r.yMax * n.y;
+		
+		float[] values = {
+			xMin + yMin, xMin + yMax,
+			xMax + yMin, xMax + yMax };
+		
+		float min = Mathf.Min(values);
+		float max = Mathf.Max(values);
+				
+		return new Vector2(min, max);
+	}
+	
+	private float Overlap(Vector2 a, Vector2 b) {
+		if(a.x < b.x) {
+			return a.y - b.x; 
+		} else {
+			return a.x - b.y;
+		}
+	}
+	
+	private Vector2 theCollision(Rect collider, Point collisionPoint, Vector2 moveVector) {
+		Vector2 pCollider = Project (collider, moveVector);
+		Vector2 pTile = Project (new Rect(collisionPoint.x * 32f, collisionPoint.y * 32f, 32f, 32f), moveVector);
+				
+		Vector2 r = -moveVector.normalized * Overlap (pCollider, pTile);
+		return r;
 	}
 }
