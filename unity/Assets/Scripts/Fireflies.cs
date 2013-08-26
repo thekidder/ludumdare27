@@ -24,6 +24,7 @@ public class Fireflies : MonoBehaviour {
 		
 		foreach(OTAnimatingSprite firefly in fireflies) {
 			if(firefly.GetComponent<Firefly>().Dead()) {
+				Debug.Log ("dead");
 				fireflies.Remove(firefly);
 				OT.Destroy(firefly);
 				break;
@@ -33,6 +34,7 @@ public class Fireflies : MonoBehaviour {
 	
 	public void Add(float x, float y, bool immediate = false) {
 		OTAnimatingSprite firefly = (OTAnimatingSprite) OT.CreateSprite("Firefly");
+		firefly.gameObject.SetActive(true);
 		firefly.transform.parent = this.transform;
 		firefly.transform.localPosition = new Vector3(x, y, 0f);
 		

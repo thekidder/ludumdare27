@@ -21,10 +21,14 @@ public class Firefly : MonoBehaviour {
 	private float perlinXOffset;
 	private float perlinYOffset;
 	
-	private float timeLeft;
+	private float timeLeft = 100000f;
 	
 	// Use this for initialization
 	void Start () {
+		Init ();
+	}
+	
+	void Init() {
 		visibilityChangeTime = Time.time - Random.Range(0.0f, 10.0f);
 		if(immediate) {
 			visibilityChangeTime = 0f;
