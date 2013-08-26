@@ -4,6 +4,7 @@ using System.Collections;
 public class CameraController : MonoBehaviour {
 	public GameObject sky;
 	public float nightTime = 5f;
+	public float start;
 	
 	public float cameraXPadding;
 	public float cameraYPadding;
@@ -12,13 +13,9 @@ public class CameraController : MonoBehaviour {
 	
 	// Use this for initialization
 	void Start () {
-		
-		
+		start = Time.time;
 		new OTTween(sky.GetComponent<OTGradientSprite>(), nightTime, OTEasing.Linear)
-			.Tween("alpha", 0f);// new Color(237f/255f, 48f/255f, 60f/255f));
-		
-		//new OTTween(sky.GetComponent<OTGradientSprite>().gradientColors[1], nightTime, OTEasing.Linear)
-		//	.Tween("color",  new Color(254f/255f, 252f/255f, 76f/255f));
+			.Tween("alpha", 0f);
 	}
 	
 	// Update is called once per frame

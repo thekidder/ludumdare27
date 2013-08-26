@@ -41,7 +41,7 @@ public class Firefly : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 		if(visible && Time.time - visibilityChangeTime > visibleTime) {
-			GetComponent<OTAnimatingSprite>().alpha = 0.008f;
+			GetComponent<OTAnimatingSprite>().alpha = 0.015f;
 			visible = false;
 		} else if(!visible && Time.time - visibilityChangeTime > 10.0f) {
 			SetVisible ();
@@ -71,5 +71,9 @@ public class Firefly : MonoBehaviour {
 	
 	public bool Dead() {
 		return timeLeft <= 0f;
+	}
+	
+	public bool Visible() {
+		return visible;
 	}
 }

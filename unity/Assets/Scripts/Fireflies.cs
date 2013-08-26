@@ -44,7 +44,7 @@ public class Fireflies : MonoBehaviour {
 	
 	public bool Captures(Rect net) {
 		foreach(OTAnimatingSprite firefly in fireflies) {
-			if(net.Contains(firefly.transform.position) || firefly.GetComponent<Firefly>().Dead()) {
+			if((net.Contains(firefly.transform.position) && firefly.GetComponent<Firefly>().Visible()) || firefly.GetComponent<Firefly>().Dead()) {
 				fireflies.Remove(firefly);
 				OT.Destroy(firefly);
 				return true;
