@@ -12,7 +12,9 @@ public class CollisionDetector {
 		TOP_LEFT,
 		TOP_RIGHT,
 		BOTTOM_LEFT,
-		BOTTOM_RIGHT
+		BOTTOM_RIGHT,
+		LEFT,
+		RIGHT
 	}
 	
 	private class Point {
@@ -40,18 +42,18 @@ public class CollisionDetector {
 			return null; // boundaries do not collide
 		}
 		
-		int intX = (int)(x);// + 0.5);
-		int intY = (int)(y);// + 0.5);
+		int intX = (int)(x + 0.5);
+		int intY = (int)(y + 0.5);
 		
-		if(x % TILE_SIZE == 0f) {
-			if(corner == Corner.TOP_RIGHT || corner == Corner.BOTTOM_RIGHT) {
+		if(intX % ((int)TILE_SIZE) == 0) {
+			if(corner == Corner.TOP_RIGHT || corner == Corner.BOTTOM_RIGHT || corner == Corner.RIGHT) {
 				intX -= 1;
 			}
 		}
 		
-		if(y % TILE_SIZE == 0f) {
+		if(intY % ((int)TILE_SIZE) == 0) {
 			if(corner == Corner.TOP_RIGHT || corner == Corner.TOP_LEFT) {
-				intX -= 1;
+				intY -= 1;
 			}
 		}
 		
@@ -71,7 +73,7 @@ public class CollisionDetector {
 	public bool Collides(Rect collider) {
 		return Collides (collider.xMin, collider.yMin, Corner.BOTTOM_LEFT) != null
 			|| Collides (collider.xMin, collider.yMax, Corner.TOP_LEFT) != null
-			|| Collides (collider.xMax, collider.yMax, Corner.TOP_LEFT) != null
+			|| Collides (collider.xMax, collider.yMax, Corner.TOP_RIGHT) != null
 			|| Collides (collider.xMax, collider.yMin, Corner.BOTTOM_RIGHT) != null;
 	}
 	
@@ -81,12 +83,15 @@ public class CollisionDetector {
 		Point topRight    = Collides (collider.xMax + moveVector.x, collider.yMax + moveVector.y, Corner.TOP_RIGHT);
 		Point bottomRight = Collides (collider.xMax + moveVector.x, collider.yMin + moveVector.y, Corner.BOTTOM_RIGHT);
 		
-		if(bottomLeft == null && bottomRight == null && topLeft == null && topRight == null) {
+		Point leftPoint = Collides(collider.xMin + moveVector.x, collider.yMin + moveVector.y + collider.height/2f, Corner.LEFT);
+		Point rightPoint = Collides(collider.xMax + moveVector.x, collider.yMin + moveVector.y + collider.height/2f, Corner.RIGHT);
+		
+		if(bottomLeft == null && bottomRight == null && topLeft == null && topRight == null && leftPoint == null && rightPoint == null) {
 			return moveVector;
 		}
 		
-		bool left   = bottomLeft  != null && topLeft     != null;
-		bool right  = bottomRight != null && topRight    != null;
+		bool left   = (bottomLeft  != null && topLeft     != null) ||( leftPoint != null);
+		bool right  = (bottomRight != null && topRight    != null) || (rightPoint != null);
 		bool top    = topLeft     != null && topRight    != null;
 		bool bottom = bottomLeft  != null && bottomRight != null;
 		
@@ -132,9 +137,9 @@ public class CollisionDetector {
 			float x = 0;
 			float y = 0;
 			if(left) {
-				x = ((topLeft.x + 1) * TILE_SIZE) - collider.xMin;
+				x = ((leftPoint.x + 1) * TILE_SIZE) - collider.xMin;
 			} else if(right) {
-				x = topRight.x * TILE_SIZE - collider.xMax;
+				x = rightPoint.x * TILE_SIZE - collider.xMax;
 			}
 			
 			if(top) {
